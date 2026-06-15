@@ -1,10 +1,27 @@
-import os, requests
+import os
+import requests
 
 WEBHOOK = os.environ["DISCORD_WEBHOOK"]
 MAX_PRICE = 65
 
 url = "https://api.warframe.market/v1/items/arcane_avenger/orders"
-orders = requests.get(url, timeout=15).json()["payload"]["orders"]
+
+headers = {
+    "Accept": "application/json",
+    "Language": "en",
+    "Platform": "pc",
+    "User-Agent": "warframe-avenger-alert/1.0"
+}
+
+response = requests.get(url, headers=headers, timeout=20)
+
+print("Status:", response.status_code)
+
+if response.status_code != 200:
+    print(response.text[:500])
+    raise SystemExit(1)
+
+orders = response.json()["payload"]["orders"]
 
 r5 = [
     o for o in orders
